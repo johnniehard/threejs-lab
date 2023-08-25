@@ -8,7 +8,7 @@
 	let element: HTMLElement;
 
 	let scene: THREE.Scene;
-	let camera: THREE.PerspectiveCamera;
+	let camera: THREE.OrthographicCamera;
 	let renderer: THREE.Renderer;
 	let cube: THREE.Mesh;
 
@@ -37,11 +37,18 @@
 		animate();
 	});
 
+	let dot: THREE.Mesh;
+
 	function init() {
 		scene = new THREE.Scene();
 		scene.background = new THREE.Color(0x151515);
-		camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-		camera.position.z = 5;
+		// camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+		camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 );
+		camera.position.x = -5
+		camera.position.y = 5
+		camera.position.z = 5
+		
+		camera.zoom = 200
 
 		renderer = new THREE.WebGLRenderer({ antialias: true });
 		renderer.setSize(window.innerWidth, window.innerHeight);
@@ -79,8 +86,11 @@
 			// wireframe: true
 		});
 
+		dot = createControlDot();
+		draggable.add(dot);
+
 		const ico = new THREE.Mesh(geometry, material);
-		draggable.add(ico);
+		scene.add(ico);
 
 		ico.position.y = 1;
 
@@ -88,12 +98,16 @@
 
 		dragControls = new DragControls(draggable.children, camera, renderer.domElement);
 
+		dragControls.addEventListener('drag', function (event) {
+			event.object.position.z = 0; // This will prevent moving z axis, but will be on 0 line. change this to your object position of z axis.
+		});
+
 		document.addEventListener('mousemove', handleMouseMove);
 		window.addEventListener('resize', onWindowResize);
 	}
 
 	function onWindowResize() {
-		camera.aspect = window.innerWidth / window.innerHeight;
+		// camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
 
 		renderer.setSize(window.innerWidth, window.innerHeight);
@@ -106,9 +120,8 @@
 	// }
 
 	function animate() {
-		requestAnimationFrame(animate);
 
-		uniforms.u_time.value = clock.getElapsedTime()
+		uniforms.u_time.value = clock.getElapsedTime();
 
 		camera.updateMatrixWorld();
 		raycaster.setFromCamera(pointer, camera);
@@ -136,22 +149,16 @@
 		}
 
 		renderer.render(scene, camera);
+		requestAnimationFrame(animate);
 	}
 
-	function addStars(scene: THREE.Scene) {
-		const geometry = new THREE.SphereGeometry(0.25, 24, 24);
+	function createControlDot() {
+		const geometry = new THREE.SphereGeometry(0.1, 24, 24);
 
-		for (let i = 0; i < 2000; i++) {
-			const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
-			const star = new THREE.Mesh(geometry, material);
+		const material = new THREE.MeshStandardMaterial({ color: 0x0050ff });
+		const dot = new THREE.Mesh(geometry, material);
 
-			const [x, y, z] = Array(3)
-				.fill(() => {})
-				.map(() => THREE.MathUtils.randFloatSpread(100));
-			star.position.set(x, y, z);
-
-			scene.add(star);
-		}
+		return dot;
 	}
 
 	function handleMouseMove(e: MouseEvent) {
@@ -160,61 +167,9 @@
 	}
 </script>
 
-<!-- <article>
-	<h1 style="grid-column: 2 / span 5">Hello</h1>
-	<p style="grid-column: 2 / span 5">
-		Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsam, laboriosam. Esse quisquam
-		molestias, labore alias inventore sed, autem sit culpa ipsa cum corrupti ex, nulla expedita
-		illum incidunt neque mollitia. Quam quo porro doloremque eligendi. Fugiat vero quae fuga iusto
-		iste ad. Est laudantium optio id similique modi aut impedit neque pariatur magnam sint sapiente
-		facere possimus, ea suscipit, dolorum illum magni quo saepe blanditiis, quidem minima? Odit
-		nesciunt reiciendis voluptas facilis saepe soluta, explicabo exercitationem molestiae quidem
-		facere quam ducimus molestias beatae deserunt asperiores laborum a consequatur ipsum repellat
-		dolore quos quasi. Cum voluptatem repellendus eos ducimus maiores ipsa!
-	</p>
-	<p style="grid-column: 5 / span 3">
-		Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsam, laboriosam. Esse quisquam
-		molestias, labore alias inventore sed, autem sit culpa ipsa cum corrupti ex, nulla expedita
-		illum incidunt neque mollitia. Quam quo porro doloremque eligendi. Fugiat vero quae fuga iusto
-		iste ad. Est laudantium optio id similique modi aut impedit neque pariatur magnam sint sapiente
-		facere possimus, ea suscipit, dolorum illum magni quo saepe blanditiis, quidem minima? Odit
-		nesciunt reiciendis voluptas facilis saepe soluta, explicabo exercitationem molestiae quidem
-		facere quam ducimus molestias beatae deserunt asperiores laborum a consequatur ipsum repellat
-		dolore quos quasi. Cum voluptatem repellendus eos ducimus maiores ipsa!
-	</p>
-	<p style="grid-column: 2 / span 5">
-		Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsam, laboriosam. Esse quisquam
-		molestias, labore alias inventore sed, autem sit culpa ipsa cum corrupti ex, nulla expedita
-		illum incidunt neque mollitia. Quam quo porro doloremque eligendi. Fugiat vero quae fuga iusto
-		iste ad. Est laudantium optio id similique modi aut impedit neque pariatur magnam sint sapiente
-		facere possimus, ea suscipit, dolorum illum magni quo saepe blanditiis, quidem minima? Odit
-		nesciunt reiciendis voluptas facilis saepe soluta, explicabo exercitationem molestiae quidem
-		facere quam ducimus molestias beatae deserunt asperiores laborum a consequatur ipsum repellat
-		dolore quos quasi. Cum voluptatem repellendus eos ducimus maiores ipsa!
-	</p>
-</article> -->
 <div class="bg" bind:this={element} />
 
 <style>
-	article {
-		position: absolute;
-		width: 100%;
-		/* display: none; */
-		/* background: blue; */
-		color: white;
-		margin: 0 auto;
-		padding-top: 50px;
-		z-index: 10;
-		margin: 0 auto;
-		padding: 120px 0;
-
-		/* display: grid; */
-		display: none;
-		grid-template-columns: repeat(12, 1fr);
-	}
-	article > * + * {
-		margin-top: 20em;
-	}
 	.bg {
 		/* z-index: -1; */
 		position: fixed;
