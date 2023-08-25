@@ -1,6 +1,7 @@
 export default /* glsl */`
 varying vec2 vUv;
 uniform vec2 u_resolution;
+uniform vec2 position;
 uniform float u_time;
 
 float sdfCircle(vec2 p, float r){
@@ -24,7 +25,8 @@ void main() {
 
 	float radius = 1.0;
 	vec2 center = vec2(0.0);
-	center = vec2(sin(2.0 * u_time), 0.0);
+	// center = vec2(sin(2.0 * u_time), 0.0);
+	center = position.xy * 4.;
 	float distanceToCircle = sdfCircle(uv - center, radius);
 
 

@@ -23,7 +23,8 @@
 	let t = 0;
 
 	let uniforms = {
-		u_time: { value: 0.0 }
+		u_time: { value: 0.0 },
+		position: new THREE.Uniform(new THREE.Vector2())
 	};
 
 	let INTERSECTED: any;
@@ -122,6 +123,9 @@
 	function animate() {
 
 		uniforms.u_time.value = clock.getElapsedTime();
+		uniforms.position.value = new THREE.Vector2(dot.position.x, dot.position.y - 1)
+
+		// console.log(uniforms.position.value)
 
 		camera.updateMatrixWorld();
 		raycaster.setFromCamera(pointer, camera);
