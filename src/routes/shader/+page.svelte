@@ -3,7 +3,7 @@
 	import * as THREE from 'three';
 
 	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-    import { DragControls } from 'three/examples/jsm/controls/DragControls';
+	import { DragControls } from 'three/examples/jsm/controls/DragControls';
 
 	let element: HTMLElement;
 
@@ -17,11 +17,20 @@
 	const raycaster = new THREE.Raycaster();
 	const pointer = new THREE.Vector2(1, 1);
 
+	import fragmentShader from '$lib/shaders/fragment';
+	import vertexShader from '$lib/shaders/vertex';
+
 	let t = 0;
 
+	let uniforms = {
+		u_time: { value: 0.0 }
+	};
+
 	let INTERSECTED: any;
-    let controls: OrbitControls;
-    let dragControls: DragControls;
+	let controls: OrbitControls;
+	let dragControls: DragControls;
+	let draggable: THREE.Group;
+	let clock: THREE.Clock;
 
 	onMount(() => {
 		init();
@@ -52,14 +61,32 @@
 		pointLight.position.set(1, 1, 1);
 		scene.add(pointLight, ambientLight);
 
-		// const gridHelper = new THREE.GridHelper();
+		const gridHelper = new THREE.GridHelper();
 		// const lightHelper = new THREE.PointLightHelper(pointLight);
-		// scene.add(lightHelper, gridHelper);
+		scene.add(gridHelper);
 
-		addStars(scene);
+		// addStars(scene);
 
-        dragControls = new DragControls(scene.children, camera, renderer.domElement)
+		draggable = new THREE.Group();
 
+		clock = new THREE.Clock();
+
+		const geometry = new THREE.PlaneGeometry(2, 2, 10, 10);
+		const material = new THREE.ShaderMaterial({
+			fragmentShader,
+			vertexShader,
+			uniforms
+			// wireframe: true
+		});
+
+		const ico = new THREE.Mesh(geometry, material);
+		draggable.add(ico);
+
+		ico.position.y = 1;
+
+		scene.add(draggable);
+
+		dragControls = new DragControls(draggable.children, camera, renderer.domElement);
 
 		document.addEventListener('mousemove', handleMouseMove);
 		window.addEventListener('resize', onWindowResize);
@@ -81,39 +108,41 @@
 	function animate() {
 		requestAnimationFrame(animate);
 
+		uniforms.u_time.value = clock.getElapsedTime()
+
 		camera.updateMatrixWorld();
 		raycaster.setFromCamera(pointer, camera);
 
-		const intersects = raycaster.intersectObjects(scene.children, false);
+		const intersects = raycaster.intersectObjects(draggable.children, false);
+
+		// if (intersects.length > 0) {
+		// 	if (INTERSECTED != intersects[0].object) {
+		// 		if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+
+		// 		INTERSECTED = intersects[0].object;
+		// 		INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+		// 		INTERSECTED.material.emissive.setHex(0xff0000);
+		// 	}
+		// } else {
+		// 	if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+
+		// 	INTERSECTED = null;
+		// }
 
 		if (intersects.length > 0) {
-			if (INTERSECTED != intersects[0].object) {
-				if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-
-				INTERSECTED = intersects[0].object;
-				INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-				INTERSECTED.material.emissive.setHex(0xff0000);
-			}
+			controls.enableRotate = false;
 		} else {
-			if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-
-			INTERSECTED = null;
+			controls.enableRotate = true;
 		}
-
-        if(INTERSECTED){
-            controls.enableRotate = false
-        } else {
-            controls.enableRotate = true
-        }
 
 		renderer.render(scene, camera);
 	}
 
 	function addStars(scene: THREE.Scene) {
 		const geometry = new THREE.SphereGeometry(0.25, 24, 24);
-        
+
 		for (let i = 0; i < 2000; i++) {
-            const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
+			const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
 			const star = new THREE.Mesh(geometry, material);
 
 			const [x, y, z] = Array(3)
