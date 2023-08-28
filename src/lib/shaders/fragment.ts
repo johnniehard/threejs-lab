@@ -3,6 +3,7 @@ varying vec2 vUv;
 uniform vec2 u_resolution;
 uniform vec3 u_meshPosition;
 uniform float u_time;
+uniform float u_size;
 
 float sdfCircle(vec2 p, float r){
 	return length(p) - r;
@@ -29,13 +30,13 @@ void main() {
 	// center = position.xy * 4.;
 	// float distanceToCircle = sdfCircle(uv - center, radius);
 
-	float distance = length(uv - u_meshPosition.xy);
+	float distance = length(uv - (u_meshPosition.xy / u_size) );
 
 
 	// color = vec3(uv.x, uv.y, 0.0);
 	color = distance > 0.05 ? white : red;
 	// color = color * exp(distanceToCircle);
-	color = color * vec3(1.0, vec2(1.0 - exp(-20.0 * abs(distance))));
+	color = color * vec3(1.0, vec2(1.0 - exp(-10.0 * abs(distance))));
 
 	gl_FragColor = vec4( color, 1.0 );
 }

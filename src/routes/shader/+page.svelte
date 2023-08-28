@@ -21,13 +21,14 @@
 	import vertexShader from '$lib/shaders/vertex';
 
 	let t = 0;
+	const PLANE_SIZE = 4.0;
 
 	let uniforms = {
 		u_time: { value: 0.0 },
-		u_meshPosition: new THREE.Uniform(new THREE.Vector3())
+		u_meshPosition: new THREE.Uniform(new THREE.Vector3()),
+		u_size: {value: PLANE_SIZE}
 	};
 
-	let INTERSECTED: any;
 	let controls: OrbitControls;
 	let dragControls: DragControls;
 	let draggable: THREE.Group;
@@ -87,21 +88,19 @@
 
 		clock = new THREE.Clock();
 
-		const geometry = new THREE.PlaneGeometry(2, 2, 10, 10);
+		dot = createControlDot();
+		draggable.add(dot);
+
+		const geometry = new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE, 10, 10);
 		const material = new THREE.ShaderMaterial({
 			fragmentShader,
 			vertexShader,
 			uniforms
-			// wireframe: true
 		});
-
-		dot = createControlDot();
-		draggable.add(dot);
 
 		plane = new THREE.Mesh(geometry, material);
 		scene.add(plane);
 
-		plane.position.y = 1;
 
 		scene.add(draggable);
 
@@ -132,7 +131,7 @@
 
 	function animate() {
 		uniforms.u_time.value = clock.getElapsedTime();
-		uniforms.u_meshPosition.value = dot.position.clone()
+		uniforms.u_meshPosition.value = dot.position.clone();
 
 		camera.updateMatrixWorld();
 		raycaster.setFromCamera(pointer, camera);
