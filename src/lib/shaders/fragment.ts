@@ -1,7 +1,7 @@
 export default /* glsl */`
 varying vec2 vUv;
 uniform vec2 u_resolution;
-uniform vec2 position;
+uniform vec3 u_meshPosition;
 uniform float u_time;
 
 float sdfCircle(vec2 p, float r){
@@ -11,10 +11,10 @@ float sdfCircle(vec2 p, float r){
 void main() {
 
 	// vec2 uv = gl_FragCoord.xy;
-	vec2 uv = vUv;
+	vec2 uv = vUv - vec2(0.5);
 
-	uv -= 0.5;
-	uv *= 10.0;
+	// uv -= 0.5;
+	// uv *= 10.0;
 	
 	vec3 black = vec3(0.0);
 	vec3 white = vec3(1.0);
@@ -23,17 +23,19 @@ void main() {
 
 	vec3 color = red;
 
-	float radius = 1.0;
-	vec2 center = vec2(0.0);
+	// float radius = 1.0;
+	// vec2 center = vec2(0.0);
 	// center = vec2(sin(2.0 * u_time), 0.0);
-	center = position.xy * 4.;
-	float distanceToCircle = sdfCircle(uv - center, radius);
+	// center = position.xy * 4.;
+	// float distanceToCircle = sdfCircle(uv - center, radius);
+
+	float distance = length(uv - u_meshPosition.xy);
 
 
 	// color = vec3(uv.x, uv.y, 0.0);
-	color = distanceToCircle > 0.0 ? white : red;
+	color = distance > 0.05 ? white : red;
 	// color = color * exp(distanceToCircle);
-	color = color * vec3(1.0, vec2(1.0 - exp(-10.0 * abs(distanceToCircle))));
+	color = color * vec3(1.0, vec2(1.0 - exp(-20.0 * abs(distance))));
 
 	gl_FragColor = vec4( color, 1.0 );
 }

@@ -24,7 +24,7 @@
 
 	let uniforms = {
 		u_time: { value: 0.0 },
-		position: new THREE.Uniform(new THREE.Vector2())
+		u_meshPosition: new THREE.Uniform(new THREE.Vector3())
 	};
 
 	let INTERSECTED: any;
@@ -32,6 +32,7 @@
 	let dragControls: DragControls;
 	let draggable: THREE.Group;
 	let clock: THREE.Clock;
+	let plane: THREE.Mesh;
 
 	onMount(() => {
 		init();
@@ -44,12 +45,19 @@
 		scene = new THREE.Scene();
 		scene.background = new THREE.Color(0x151515);
 		// camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-		camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 );
-		camera.position.x = -5
-		camera.position.y = 5
-		camera.position.z = 5
-		
-		camera.zoom = 200
+		camera = new THREE.OrthographicCamera(
+			window.innerWidth / -2,
+			window.innerWidth / 2,
+			window.innerHeight / 2,
+			window.innerHeight / -2,
+			1,
+			1000
+		);
+		camera.position.x = -5;
+		camera.position.y = 5;
+		camera.position.z = 5;
+
+		camera.zoom = 200;
 
 		renderer = new THREE.WebGLRenderer({ antialias: true });
 		renderer.setSize(window.innerWidth, window.innerHeight);
@@ -90,10 +98,10 @@
 		dot = createControlDot();
 		draggable.add(dot);
 
-		const ico = new THREE.Mesh(geometry, material);
-		scene.add(ico);
+		plane = new THREE.Mesh(geometry, material);
+		scene.add(plane);
 
-		ico.position.y = 1;
+		plane.position.y = 1;
 
 		scene.add(draggable);
 
@@ -121,11 +129,8 @@
 	// }
 
 	function animate() {
-
 		uniforms.u_time.value = clock.getElapsedTime();
-		uniforms.position.value = new THREE.Vector2(dot.position.x, dot.position.y - 1)
-
-		// console.log(uniforms.position.value)
+		uniforms.u_meshPosition.value = dot.position.clone()
 
 		camera.updateMatrixWorld();
 		raycaster.setFromCamera(pointer, camera);
@@ -172,8 +177,25 @@
 </script>
 
 <div class="bg" bind:this={element} />
+<div class="overlay">
+	<span>
+		{uniforms.u_meshPosition.value.x}
+	</span>
+	<span>
+		{uniforms.u_meshPosition.value.y}
+	</span>
+	<span>
+		{uniforms.u_meshPosition.value.z}
+	</span>
+</div>
 
 <style>
+	.overlay {
+		display: flex;
+		flex-direction: column;
+		position: absolute;
+		color: white;
+	}
 	.bg {
 		/* z-index: -1; */
 		position: fixed;
