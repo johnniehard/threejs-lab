@@ -2,6 +2,7 @@ export default /* glsl */`
 varying vec2 vUv;
 uniform vec2 u_resolution;
 uniform vec3 u_meshPosition;
+uniform vec3 u_meshPosition2;
 uniform float u_time;
 uniform float u_size;
 
@@ -12,7 +13,8 @@ float sdfCircle(vec2 p, float r){
 void main() {
 
 	// vec2 uv = gl_FragCoord.xy;
-	vec2 uv = vUv - vec2(0.5);
+	vec2 uv = vUv;
+	uv = uv - vec2(0.5);
 
 	// uv -= 0.5;
 	// uv *= 10.0;
@@ -31,12 +33,18 @@ void main() {
 	// float distanceToCircle = sdfCircle(uv - center, radius);
 
 	float distance = length(uv - (u_meshPosition.xy / u_size) );
+	float distance2 = length(uv - ((u_meshPosition2.xy) / u_size) );
 
 
 	// color = vec3(uv.x, uv.y, 0.0);
-	color = distance > 0.05 ? white : red;
-	// color = color * exp(distanceToCircle);
-	color = color * vec3(1.0, vec2(1.0 - exp(-10.0 * abs(distance))));
+	vec3 circleColor = distance > 0.05 ? white : blue;
+	color = circleColor;
+
+	vec3 circleColor2 = distance2 > 0.05 ? white : red;
+	color = color * circleColor2 ;
+
+
+	// color = vec3(uv.x / 2.0, 0.0, 0.0);
 
 	gl_FragColor = vec4( color, 1.0 );
 }

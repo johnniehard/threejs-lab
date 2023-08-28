@@ -26,6 +26,7 @@
 	let uniforms = {
 		u_time: { value: 0.0 },
 		u_meshPosition: new THREE.Uniform(new THREE.Vector3()),
+		u_meshPosition2: new THREE.Uniform(new THREE.Vector3()),
 		u_size: {value: PLANE_SIZE}
 	};
 
@@ -41,6 +42,7 @@
 	});
 
 	let dot: THREE.Mesh;
+	let dot2: THREE.Mesh;
 
 	function init() {
 		scene = new THREE.Scene();
@@ -89,7 +91,10 @@
 		clock = new THREE.Clock();
 
 		dot = createControlDot();
-		draggable.add(dot);
+		dot.position.x = -1.0;
+		dot2 = createControlDot();
+		dot2.position.x = 1.0;
+		draggable.add(dot, dot2);
 
 		const geometry = new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE, 10, 10);
 		const material = new THREE.ShaderMaterial({
@@ -132,6 +137,7 @@
 	function animate() {
 		uniforms.u_time.value = clock.getElapsedTime();
 		uniforms.u_meshPosition.value = dot.position.clone();
+		uniforms.u_meshPosition2.value = dot2.position.clone();
 
 		camera.updateMatrixWorld();
 		raycaster.setFromCamera(pointer, camera);
@@ -165,7 +171,7 @@
 	function createControlDot() {
 		const geometry = new THREE.SphereGeometry(0.1, 24, 24);
 
-		const material = new THREE.MeshStandardMaterial({ color: 0x0050ff });
+		const material = new THREE.MeshStandardMaterial({ color: 0x000000 });
 		const dot = new THREE.Mesh(geometry, material);
 
 		return dot;
