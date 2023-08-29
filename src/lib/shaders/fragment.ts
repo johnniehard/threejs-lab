@@ -26,7 +26,7 @@ void main() {
 	vec3 c = vec3(0.0, 1.0, 1.0);
 	vec3 m = vec3(1.0, 0.0, 1.0);
 
-	vec3 color = red;
+	vec4 color = vec4(0.0);
 
 	// float radius = 1.0;
 	// vec2 center = vec2(0.0);
@@ -37,26 +37,19 @@ void main() {
 	float distance1 = distance(uv, (u_meshPosition.xy) / u_size  );
 	float distance2 = distance(uv, u_meshPosition2.xy / u_size );
 
-	// color = vec3(uv.x, uv.y, 0.0);
-	// vec3 circleColor1 = distance1 > 0.05 ? white : c;
-	vec3 circleColor1 = smoothstep(.5, .0, distance1) * c;
-	// vec3 circleColor = (0.5 - distance) * c;
-	color = circleColor1;
+	float distancePoints = distance(u_meshPosition, u_meshPosition2);
 
-	// vec3 circleColor2 = distance2 > 0.05 ? white : m;
-	// vec3 circleColor2 = step(distance2, 0.05) * m;
-	vec3 circleColor2 = smoothstep(.5, .0, distance2) * m;
+	float step1 = smoothstep(0.3, .0, distance1);
+	vec4 circleColor1 = vec4( step1 * c, step1);
+	float step2 = smoothstep(0.3, .0, distance2);
+	vec4 circleColor2 = vec4( step2 * m, step2);
 
-
-	// vec3 circleColor2 = (0.5 - distance) * m;
-
-	// color = mix( color , circleColor2, 0.5) ;
-	color = color + circleColor2;
+	color =  mix(circleColor1, circleColor2, distancePoints) + mix(circleColor2, circleColor1, distancePoints);
 
 
 	// color = vec3(uv.x / 2.0, 0.0, 0.0);
 
-	gl_FragColor = vec4( color, 1.0 );
+	gl_FragColor = color;
 }
 
 

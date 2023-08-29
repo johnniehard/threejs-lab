@@ -21,7 +21,7 @@
 	import vertexShader from '$lib/shaders/vertex';
 
 	let t = 0;
-	const PLANE_SIZE = 4.0;
+	const PLANE_SIZE = 8.0;
 
 	let uniforms = {
 		u_time: { value: 0.0 },
@@ -77,7 +77,7 @@
 		pointLight.position.set(1, 1, 1);
 		scene.add(pointLight, ambientLight);
 
-		// const gridHelper = new THREE.GridHelper();
+		const gridHelper = new THREE.GridHelper();
 		// const lightHelper = new THREE.PointLightHelper(pointLight);
 		// scene.add(gridHelper);
 
@@ -96,7 +96,8 @@
 		const material = new THREE.ShaderMaterial({
 			fragmentShader,
 			vertexShader,
-			uniforms
+			uniforms,
+			transparent: true,
 		});
 
 		plane = new THREE.Mesh(geometry, material);
