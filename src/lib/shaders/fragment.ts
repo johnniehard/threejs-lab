@@ -31,16 +31,17 @@ void main() {
 
 	float distancePoints = distance(uv, (u_meshPosition.xy + u_meshPosition2.xy + u_meshPosition3.xy) );
 
-	float step1 = smoothstep(0.3, .0, distance1 * distancePoints);
+	float step1 = smoothstep(.3, .0, distance1 );
 	vec4 circleColor1 = vec4( step1 * c, step1);
-	float step2 = smoothstep(0.3, .0, distance2 * distancePoints);
+	float step2 = smoothstep(.3, .0, distance2 );
 	vec4 circleColor2 = vec4( step2 * m, step2);
-	float step3 = smoothstep(0.3, .0, distance3 * distancePoints);
+	float step3 = smoothstep(.3, .0, distance3 );
 	vec4 circleColor3 = vec4( step3 * y, step3);
 
-	color = color + mix(color, circleColor1, distancePoints);
-	color = color +  mix(color, circleColor2, distancePoints);
-	color = color + mix(color, circleColor3, distancePoints);
+	// color = color + mix(color, circleColor1, 0.5);
+	// color = color +  mix(color, circleColor2, 0.5);
+	// color = color + mix(color, circleColor3, 0.5);
+	color = circleColor1 + circleColor2 + circleColor3;
 
 	gl_FragColor = color;
 }
