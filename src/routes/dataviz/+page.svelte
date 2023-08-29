@@ -4,7 +4,7 @@
 
 	import type { PageData } from './$types';
 
-	export let data: PageData;	
+	export let data: PageData;
 	import fragmentShader from './shaders/fragment';
 	import vertexShader from './shaders/vertex';
 	import { scaleLinear, scaleLog, scaleSymlog } from 'd3-scale';
@@ -18,7 +18,7 @@
 	const scaleX = scaleLinear().domain(yearExtent).range([-1, 1]);
 	const scaleY = scaleSymlog().domain(popExtent).range([-2, 2]);
 
-	console.log(scaleY(2887398))
+	console.log(scaleY(2887398));
 
 	let element: HTMLElement;
 
@@ -29,10 +29,13 @@
 
 	let pointLight: THREE.PointLight;
 
+	let INTERSECTED: any;
+
 	const raycaster = new THREE.Raycaster();
-	const pointer = new THREE.Vector2(1, 1);
-
-
+	raycaster.params = {
+		Line: { threshold: 0.01 }
+	};
+	const pointer = new THREE.Vector2();
 
 	let t = 0;
 	const PLANE_SIZE = 8.0;
@@ -68,12 +71,9 @@
 		// camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 		camera = new THREE.OrthographicCamera(-aspectRatio, aspectRatio, 1, -1, 1, 100);
 
-		camera.position.x = 0;
-		camera.position.y = 0;
-		camera.position.z = 10;
-		// camera.rotateZ(Math.PI * 2);
-
+		camera.position.z = 20;
 		camera.zoom = 0.5;
+		// camera.rotateZ(Math.PI * 2);
 
 		renderer = new THREE.WebGLRenderer({ antialias: true });
 		renderer.setSize(window.innerWidth, window.innerHeight);
@@ -102,22 +102,18 @@
 
 		clock = new THREE.Clock();
 
-
 		Object.values(data.data.groupedByCountry)
 			.sort((a, b) => a[0].population - b[0].population)
-		.forEach((countryData, i) => {
+			.forEach((countryData, i) => {
+				const material = new THREE.LineBasicMaterial({ color: 0xffffff });
 
-			const material = new THREE.LineBasicMaterial({ color: 0xffffff });
-	
-	
-			const points = countryData.map(d => new THREE.Vector3(scaleX(d.year), scaleY(d.population), i * -0.01))
-			const geometry = new THREE.BufferGeometry().setFromPoints(points);
-			const line = new THREE.Line( geometry, material );
-			scene.add( line );
-
-
-		})
-
+				const points = countryData.map(
+					(d) => new THREE.Vector3(scaleX(d.year), scaleY(d.population), i * -0.01)
+				);
+				const geometry = new THREE.BufferGeometry().setFromPoints(points);
+				const line = new THREE.Line(geometry, material);
+				scene.add(line);
+			});
 
 		dragControls = new DragControls(draggable.children, camera, renderer.domElement);
 
@@ -159,23 +155,30 @@
 		camera.updateMatrixWorld();
 		raycaster.setFromCamera(pointer, camera);
 
-		const intersects = raycaster.intersectObjects(draggable.children, false);
+		const intersects = raycaster.intersectObjects(scene.children);
 
 		// TODO: mix()? GLSL
 
-		// if (intersects.length > 0) {
-		// 	if (INTERSECTED != intersects[0].object) {
-		// 		if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-
-		// 		INTERSECTED = intersects[0].object;
-		// 		INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-		// 		INTERSECTED.material.emissive.setHex(0xff0000);
-		// 	}
-		// } else {
-		// 	if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-
-		// 	INTERSECTED = null;
+		// for (let i = 0; i < intersects.length; i++) {
+		// 	intersects[i].object.material.color.set(0xff0000);
 		// }
+		if (intersects.length > 0) {
+			if (INTERSECTED != intersects[0].object) {
+				if (INTERSECTED) {
+					INTERSECTED.material.color.setHex(INTERSECTED.currentHex);
+				}
+
+				INTERSECTED = intersects[0].object;
+				INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
+				INTERSECTED.material.color.setHex(0xff0000);
+			}
+		} else {
+			if (INTERSECTED) {
+				INTERSECTED.material.color.setHex(INTERSECTED.currentHex);
+			}
+
+			INTERSECTED = null;
+		}
 
 		if (intersects.length > 0) {
 			controls.enableRotate = false;
