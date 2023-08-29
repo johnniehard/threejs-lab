@@ -11,13 +11,8 @@ float sdfCircle(vec2 p, float r){
 }
 
 void main() {
-
-	// vec2 uv = gl_FragCoord.xy;
 	vec2 uv = vUv;
 	uv = uv - vec2(0.5);
-
-	// uv -= 0.5;
-	// uv *= 10.0;
 	
 	vec3 black = vec3(0.0);
 	vec3 white = vec3(1.0);
@@ -27,12 +22,6 @@ void main() {
 	vec3 m = vec3(1.0, 0.0, 1.0);
 
 	vec4 color = vec4(0.0);
-
-	// float radius = 1.0;
-	// vec2 center = vec2(0.0);
-	// center = vec2(sin(2.0 * u_time), 0.0);
-	// center = position.xy * 4.;
-	// float distanceToCircle = sdfCircle(uv - center, radius);
 
 	float distance1 = distance(uv, (u_meshPosition.xy) / u_size  );
 	float distance2 = distance(uv, u_meshPosition2.xy / u_size );
@@ -46,11 +35,6 @@ void main() {
 
 	color =  mix(circleColor1, circleColor2, distancePoints) + mix(circleColor2, circleColor1, distancePoints);
 
-
-	// color = vec3(uv.x / 2.0, 0.0, 0.0);
-
 	gl_FragColor = color;
 }
-
-
 `;
