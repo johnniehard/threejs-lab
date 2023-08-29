@@ -14,14 +14,13 @@ float sdfCircle(vec2 p, float r){
 void main() {
 	vec2 uv = vUv;
 	uv = uv - vec2(0.5);
-	
-	vec3 black = vec3(0.0);
-	vec3 white = vec3(1.0);
-	vec3 blue = vec3(0.5, 0.5, 1.0);
-	vec3 red = vec3(1.0, 0.0, 0.0);
+
 	vec3 c = vec3(0.0, 1.0, 1.0);
 	vec3 m = vec3(1.0, 0.0, 1.0);
 	vec3 y = vec3(1.0, 1.0, 0.0);
+	vec3 r = vec3(1.0, 0.0, 0.5);
+	vec3 g = vec3(0.5, 1.0, 0.0);
+	vec3 b = vec3(0.0, 0.5, 1.0);
 
 	vec4 color = vec4(0.0);
 
