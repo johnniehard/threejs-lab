@@ -35,6 +35,7 @@
 	let draggable: THREE.Group;
 	let clock: THREE.Clock;
 	let plane: THREE.Mesh;
+	let aspectRatio: number;
 
 	onMount(() => {
 		init();
@@ -43,24 +44,20 @@
 
 	let dot: THREE.Mesh;
 	let dot2: THREE.Mesh;
-
+	
 	function init() {
 		scene = new THREE.Scene();
+		aspectRatio = window.innerWidth / window.innerHeight;
 		scene.background = new THREE.Color(0x151515);
 		// camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-		camera = new THREE.OrthographicCamera(
-			window.innerWidth / -2,
-			window.innerWidth / 2,
-			window.innerHeight / 2,
-			window.innerHeight / -2,
-			1,
-			1000
-		);
-		camera.position.x = -5;
-		camera.position.y = 5;
-		camera.position.z = 5;
+		camera = new THREE.OrthographicCamera(-aspectRatio, aspectRatio, 1, -1, 1, 100);
 
-		camera.zoom = 200;
+		camera.position.x = 0;
+		camera.position.y = 0;
+		camera.position.z = 10;
+		// camera.rotateZ(Math.PI * 2);
+
+		camera.zoom = 0.5
 
 		renderer = new THREE.WebGLRenderer({ antialias: true });
 		renderer.setSize(window.innerWidth, window.innerHeight);
@@ -80,12 +77,11 @@
 		pointLight.position.set(1, 1, 1);
 		scene.add(pointLight, ambientLight);
 
-		const gridHelper = new THREE.GridHelper();
+		// const gridHelper = new THREE.GridHelper();
 		// const lightHelper = new THREE.PointLightHelper(pointLight);
-		scene.add(gridHelper);
+		// scene.add(gridHelper);
 
 		// addStars(scene);
-
 		draggable = new THREE.Group();
 
 		clock = new THREE.Clock();
@@ -96,7 +92,7 @@
 		dot2.position.x = 1.0;
 		draggable.add(dot, dot2);
 
-		const geometry = new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE, 10, 10);
+		const geometry = new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE);
 		const material = new THREE.ShaderMaterial({
 			fragmentShader,
 			vertexShader,
@@ -106,6 +102,7 @@
 		plane = new THREE.Mesh(geometry, material);
 		scene.add(plane);
 
+		// plane.rotateX(Math.PI * 1.5)
 
 		scene.add(draggable);
 
@@ -120,10 +117,16 @@
 	}
 
 	function onWindowResize() {
-		(camera.left = window.innerWidth / -2),
-			(camera.right = window.innerWidth / 2),
-			(camera.top = window.innerHeight / 2),
-			(camera.bottom = window.innerHeight / -2),
+		// (camera.left = window.innerWidth / -2),
+		// 	(camera.right = window.innerWidth / 2),
+		// 	(camera.top = window.innerHeight / 2),
+		// 	(camera.bottom = window.innerHeight / -2),
+		aspectRatio = window.innerWidth / window.innerHeight;
+
+		camera.left = -aspectRatio
+		camera.right = aspectRatio
+		camera.top = 1
+		camera.bottom = -1
 			renderer.setSize(window.innerWidth, window.innerHeight);
 		camera.updateProjectionMatrix();
 	}
@@ -143,6 +146,8 @@
 		raycaster.setFromCamera(pointer, camera);
 
 		const intersects = raycaster.intersectObjects(draggable.children, false);
+
+		// TODO: mix()? GLSL
 
 		// if (intersects.length > 0) {
 		// 	if (INTERSECTED != intersects[0].object) {
