@@ -17,8 +17,8 @@
 	const raycaster = new THREE.Raycaster();
 	const pointer = new THREE.Vector2(1, 1);
 
-	import fragmentShader from '$lib/shaders/fragment';
-	import vertexShader from '$lib/shaders/vertex';
+	import fragmentShader from './shaders/fragment';
+	import vertexShader from './shaders/vertex';
 
 	let t = 0;
 	const PLANE_SIZE = 8.0;
