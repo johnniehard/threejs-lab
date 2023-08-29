@@ -106,13 +106,64 @@
 			.sort((a, b) => a[0].population - b[0].population)
 			.forEach((countryData, i) => {
 				const material = new THREE.LineBasicMaterial({ color: 0xffffff });
-
 				const points = countryData.map(
 					(d) => new THREE.Vector3(scaleX(d.year), scaleY(d.population), i * -0.01)
 				);
 				const geometry = new THREE.BufferGeometry().setFromPoints(points);
 				const line = new THREE.Line(geometry, material);
 				scene.add(line);
+
+				// Create a curve path from the points
+				const curvePath = new THREE.CurvePath();
+				for (let j = 0; j < countryData.length - 1; j++) {
+					const start = new THREE.Vector3(
+						scaleX(countryData[j].year),
+						scaleY(countryData[j].population),
+						i * -0.01
+					);
+					const end = new THREE.Vector3(
+						scaleX(countryData[j + 1].year),
+						scaleY(countryData[j + 1].population),
+						i * -0.01
+					);
+
+					const lineCurve = new THREE.LineCurve3(start, end);
+					curvePath.add(lineCurve);
+				}
+
+				// Create a TubeGeometry based on the curve path
+				const segments = 8; // Number of segments along the tube
+				const radius = 0.01; // Radius of the tube
+				const radialSegments = 8; // Number of segments around the tube
+				const closed = false; // Whether the tube should be closed or not
+
+				// const tubeGeometry = new THREE.TubeGeometry(
+				// 	curvePath,
+				// 	segments,
+				// 	radius,
+				// 	radialSegments,
+				// 	closed
+				// );
+
+				// Create material and mesh
+				// const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+				// const mesh = new THREE.Mesh(tubeGeometry, material);
+
+				const tubeGeometry2 = new THREE.TubeGeometry(
+					curvePath,
+					segments,
+					radius,
+					radialSegments,
+					closed
+				);
+
+				// Create material and mesh
+				const material2 = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.0 });
+				const mesh2 = new THREE.Mesh(tubeGeometry2, material2);
+
+				// Add tube to the scene
+				// scene.add(mesh);
+				scene.add(mesh2);
 			});
 
 		dragControls = new DragControls(draggable.children, camera, renderer.domElement);
@@ -165,16 +216,16 @@
 		if (intersects.length > 0) {
 			if (INTERSECTED != intersects[0].object) {
 				if (INTERSECTED) {
-					INTERSECTED.material.color.setHex(INTERSECTED.currentHex);
+					INTERSECTED.material.opacity = INTERSECTED.currentOpacity;
 				}
 
 				INTERSECTED = intersects[0].object;
-				INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
-				INTERSECTED.material.color.setHex(0xff0000);
+				INTERSECTED.currentOpacity = INTERSECTED.material.opacity
+				INTERSECTED.material.opacity = 0.8;
 			}
 		} else {
 			if (INTERSECTED) {
-				INTERSECTED.material.color.setHex(INTERSECTED.currentHex);
+				INTERSECTED.material.opacity = INTERSECTED.currentOpacity;
 			}
 
 			INTERSECTED = null;
