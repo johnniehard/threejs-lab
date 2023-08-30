@@ -7,10 +7,6 @@ uniform vec3 u_meshPosition3;
 uniform float u_time;
 uniform float u_size;
 
-float sdfCircle(vec2 p, float r){
-	return length(p) - r;
-}
-
 void main() {
 	vec2 uv = vUv;
 	uv = uv - vec2(0.5);
