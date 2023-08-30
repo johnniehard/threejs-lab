@@ -37,9 +37,6 @@ void main() {
 	float step3 = smoothstep(.3, .0, distance3 );
 	vec4 circleColor3 = vec4( step3 * y, step3);
 
-	// color = color + mix(color, circleColor1, 0.5);
-	// color = color +  mix(color, circleColor2, 0.5);
-	// color = color + mix(color, circleColor3, 0.5);
 	color = circleColor1 + circleColor2 + circleColor3;
 
 	gl_FragColor = color;

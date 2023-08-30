@@ -51,27 +51,18 @@
 		scene = new THREE.Scene();
 		aspectRatio = window.innerWidth / window.innerHeight;
 		scene.background = new THREE.Color(0x151515);
-		// camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 		camera = new THREE.OrthographicCamera(-aspectRatio, aspectRatio, 1, -1, 1, 100);
 
 		camera.position.x = 0;
 		camera.position.y = 0;
 		camera.position.z = 10;
-		// camera.rotateZ(Math.PI * 2);
-
 		camera.zoom = 0.5
 
 		renderer = new THREE.WebGLRenderer({ antialias: true });
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		element.appendChild(renderer.domElement);
 
-		// cube = createCube();
-		// scene.add(cube);
-
 		const ambientLight = new THREE.AmbientLight(0xffffff);
-
-		const spaceTexture = new THREE.TextureLoader().load('outer_space.jpg');
-		// scene.background = spaceTexture;
 
 		controls = new OrbitControls(camera, renderer.domElement);
 
@@ -79,11 +70,6 @@
 		pointLight.position.set(1, 1, 1);
 		scene.add(pointLight, ambientLight);
 
-		const gridHelper = new THREE.GridHelper();
-		// const lightHelper = new THREE.PointLightHelper(pointLight);
-		// scene.add(gridHelper);
-
-		// addStars(scene);
 		draggable = new THREE.Group();
 
 		clock = new THREE.Clock();
@@ -111,14 +97,12 @@
 		plane = new THREE.Mesh(geometry, material);
 		scene.add(plane);
 
-		// plane.rotateX(Math.PI * 1.5)
-
 		scene.add(draggable);
 
 		dragControls = new DragControls(draggable.children, camera, renderer.domElement);
 
 		dragControls.addEventListener('drag', function (event) {
-			event.object.position.z = 0; // This will prevent moving z axis, but will be on 0 line. change this to your object position of z axis.
+			event.object.position.z = 0;
 		});
 
 		document.addEventListener('mousemove', handleMouseMove);
@@ -126,10 +110,6 @@
 	}
 
 	function onWindowResize() {
-		// (camera.left = window.innerWidth / -2),
-		// 	(camera.right = window.innerWidth / 2),
-		// 	(camera.top = window.innerHeight / 2),
-		// 	(camera.bottom = window.innerHeight / -2),
 		aspectRatio = window.innerWidth / window.innerHeight;
 
 		camera.left = -aspectRatio
@@ -139,12 +119,6 @@
 			renderer.setSize(window.innerWidth, window.innerHeight);
 		camera.updateProjectionMatrix();
 	}
-
-	// function createCube() {
-	// 	const geometry = new THREE.BoxGeometry(1, 1, 1);
-	// 	const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-	// 	return new THREE.Mesh(geometry, material);
-	// }
 
 	function animate() {
 		uniforms.u_time.value = clock.getElapsedTime();
@@ -156,22 +130,6 @@
 		raycaster.setFromCamera(pointer, camera);
 
 		const intersects = raycaster.intersectObjects(draggable.children, false);
-
-		// TODO: mix()? GLSL
-
-		// if (intersects.length > 0) {
-		// 	if (INTERSECTED != intersects[0].object) {
-		// 		if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-
-		// 		INTERSECTED = intersects[0].object;
-		// 		INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-		// 		INTERSECTED.material.emissive.setHex(0xff0000);
-		// 	}
-		// } else {
-		// 	if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-
-		// 	INTERSECTED = null;
-		// }
 
 		if (intersects.length > 0) {
 			controls.enableRotate = false;
